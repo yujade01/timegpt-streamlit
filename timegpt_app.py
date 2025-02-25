@@ -13,12 +13,11 @@ st.write("This is a simple app to generate time series forecasts using TimeGPT m
 nixtla_api_key = st.text_input("Enter your Nixtla API key", type="password")
 #os.getenv('NIXTLA_API_KEY')
 
-nixtla_client = NixtlaClient(
-    api_key = nixtla_api_key,
-)
-nixtla_client.validate_api_key()
-
 if nixtla_api_key:
+    nixtla_client = NixtlaClient(
+        api_key = nixtla_api_key,
+    )
+    nixtla_client.validate_api_key()
     # Upload csv file
     uploaded_file = st.file_uploader("Upload CSV file", type=['csv'])
 
