@@ -1,10 +1,8 @@
 import os
 import pandas as pd
+from io import StringIO
 from nixtla import NixtlaClient
 import streamlit as st
-
-csv_path = "csv files/"
-filename = "all_campaign_daily_data_2023-2024.csv"
 
 st.title("TimeGPT App")
 st.write("This is a simple app to generate time series forecasts using TimeGPT model.")
@@ -20,12 +18,12 @@ if nixtla_api_key:
     nixtla_client.validate_api_key()
     # Upload csv file
     uploaded_file = st.file_uploader("Upload CSV file", type=['csv'])
-
+    
     if uploaded_file is not None:
-        # print(uploaded_file)
-        # Read csv file
-        df = pd.read_csv(csv_path + uploaded_file.name) # skiprows=6 (skip first 6 rows)
-        # df = df[:-1] # remove last row
+        bytes_data = uploaded_file.read()
+        data_str = bytes_data.decode('utf-8')
+        # Read file from byte data
+        df = pd.read_csv(uploaded_file.name) # skiprows=6 (skip first 6 rows)
         # Convert to datetime format
         print(df.columns)
         df["Date"] = pd.to_datetime(df["Date"])
@@ -38,15 +36,15 @@ if nixtla_api_key:
             (pd.to_datetime(df["Date"].min()), pd.to_datetime(df["Date"].max())),
             format="MM.DD.YYYY",
         )
-        print("Min date:", d[0])
-        print("Max date:", d[1])
-        min_date = str(d[0])
-        max_date = str(d[1])
-        df_filter = df.loc[(df["Date"] >= min_date) & (df["Date"] <= max_date)]
-        
-        column_list = df_filter.drop(columns=["Date"]).columns
-        
         if d:
+            min_date = str(d[0])
+            max_date = str(d[1])
+            df_filter = df.loc[(df["Date"] >= min_date) & (df["Date"] <= max_date)]
+            # Preview selected data
+            st.write("Selected Data preview:")
+            st.write(df_filter.head(10))
+            # Select numeric columns
+            column_list = df.select_dtypes(include=np.number).columns.tolist()
             TARGET = st.selectbox("Select Target variable", column_list)
             forecast_horizon = st.number_input("Forecast horizon", value=None, min_value=1, max_value=365)
 
