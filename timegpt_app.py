@@ -27,9 +27,6 @@ if nixtla_api_key:
         # Convert to datetime format
         print(df.columns)
         df["Date"] = pd.to_datetime(df["Date"])
-        # Preview data
-        st.write("Data preview:")
-        st.write(df.head(10))
 
         d = st.date_input(
             "Select your date range as historical data: ",
@@ -42,7 +39,7 @@ if nixtla_api_key:
             df_filter = df.loc[(df["Date"] >= min_date) & (df["Date"] <= max_date)]
             # Preview selected data
             st.write("Selected Data preview:")
-            st.write(df_filter.head(10))
+            st.write(df_filter)
             # Select numeric columns
             column_list = df.select_dtypes(include=np.number).columns.tolist()
             TARGET = st.selectbox("Select Target variable", column_list)
