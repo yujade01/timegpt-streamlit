@@ -22,7 +22,7 @@ if nixtla_api_key:
         bytes_data = uploaded_file.read()
         data_str = bytes_data.decode('utf-8')
         # Read file from byte data
-        df = pd.read_csv(uploaded_file.name) # skiprows=6 (skip first 6 rows)
+        df = pd.read_csv(StringIO(data_str)) # skiprows=6 (skip first 6 rows)
         # Convert to datetime format
         print(df.columns)
         df["Date"] = pd.to_datetime(df["Date"])
