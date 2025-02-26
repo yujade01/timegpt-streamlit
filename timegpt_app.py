@@ -7,7 +7,6 @@ import streamlit as st
 st.title("TimeGPT App")
 st.write("This is a simple app to generate time series forecasts using TimeGPT model.")
 
-
 nixtla_api_key = st.text_input("Enter your Nixtla API key", type="password")
 #os.getenv('NIXTLA_API_KEY')
 
