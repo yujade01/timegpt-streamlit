@@ -64,13 +64,17 @@ if nixtla_api_key:
                 df_processed = df_processed[["unique_id", "Date", target]]
                 df_processed = df_processed.rename(columns={"Date":"ds",
                                         target:"y"})
-                timegpt_fcst_df = nixtla_client.forecast(df=df_processed, h=forecast_horizon, freq='D', time_col='ds', target_col='y')
-                if df_processed.y.dtypes == "int64":
-                    timegpt_fcst_df["TimeGPT"] = round(timegpt_fcst_df["TimeGPT"])
-                
-                st.write("TimeGPT forecast result:")
-                st.write(timegpt_fcst_df)
-                st.write("Plot:")
-                st.write(nixtla_client.plot(df_processed, timegpt_fcst_df, time_col='ds', target_col='y'))
+                try:
+                    timegpt_fcst_df = nixtla_client.forecast(df=df_processed, h=forecast_horizon, freq='D', time_col='ds', target_col='y')
+                    if df_processed.y.dtypes == "int64":
+                        timegpt_fcst_df["TimeGPT"] = round(timegpt_fcst_df["TimeGPT"])
+                    
+                    st.write("TimeGPT forecast result:")
+                    st.write(timegpt_fcst_df)
+                    st.write("Plot:")
+                    st.write(nixtla_client.plot(df_processed, timegpt_fcst_df, time_col='ds', target_col='y'))
+                except Exception as e:
+                    st.error(f"Error: {e}")
+                    st.info("Please check your request limit at Nixtla Dashboard: https://dashboard.nixtla.io/")
         else:
             st.info("No date columns in the csv file")
