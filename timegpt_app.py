@@ -42,7 +42,7 @@ if nixtla_api_key:
                 df_merged = pd.merge(date_df, df_filter, on='Date', how='left')
                 # Select numeric columns
                 column_list = df_merged.select_dtypes(include=np.number).columns.tolist()
-                target = st.selectbox("Select Target variable", [""] + column_list)
+                target = st.selectbox("Select Target variable", column_list)
                 if target:
                     df_merged = df_merged[["Date", target]]
                     df_merged[target] = df_merged[target].fillna(0)
