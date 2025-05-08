@@ -20,10 +20,11 @@ if nixtla_api_key:
     uploaded_file = st.file_uploader("Upload CSV file", type=['csv'])
     
     if uploaded_file is not None:
-        bytes_data = uploaded_file.read()
-        data_str = bytes_data.decode('utf-8')
+        # bytes_data = uploaded_file.read()
+        # data_str = bytes_data.decode('utf-8')
         # Read file from byte data
-        df = pd.read_csv(StringIO(data_str)) # skiprows=6 (skip first 6 rows)
+        df = pd.read_csv(uploaded_file, encoding='unicode_escape') # skiprows=6 (skip first 6 rows)
+        df.rename(columns={"ORDERDATE":"Date"}, inplace=True)
         # Convert to datetime format
         print(df.columns)
         df["Date"] = pd.to_datetime(df["Date"])
@@ -40,13 +41,21 @@ if nixtla_api_key:
             # Preview selected data
             st.write("Selected Data preview:")
             st.write(df_filter)
+            # st.write(df_filter["Daily minimum temperatures"].dtypes)
+            df_filter['Daily minimum temperatures'] = pd.to_numeric(df_filter['Daily minimum temperatures'], errors='coerce')
+            date_range = pd.date_range(start=min_date, end=max_date, freq='D')
+            date_df = pd.DataFrame({'Date': date_range})
+
+            # Merge with Original Data
+            df_merged = pd.merge(date_df, df_filter, on='Date', how='left')
+            df_merged['Daily minimum temperatures'] = df_merged['Daily minimum temperatures'].fillna(0)
             # Select numeric columns
-            column_list = df.select_dtypes(include=np.number).columns.tolist()
+            column_list = df_merged.select_dtypes(include=np.number).columns.tolist()
             TARGET = st.selectbox("Select Target variable", column_list)
             forecast_horizon = st.number_input("Forecast horizon", value=None, min_value=1, max_value=365)
 
         if TARGET and forecast_horizon is not None:
-            df_processed = df_filter.copy()
+            df_processed = df_merged.copy()
             df_processed["unique_id"] = 1
             df_processed = df_processed[["unique_id", "Date", TARGET]]
             df_processed = df_processed.rename(columns={"Date":"ds",
